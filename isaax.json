@@ -1,0 +1,12 @@
+{
+  "name": "demo",
+  "version": "",
+  "description": "demo",
+  "main": "es-agent",
+  "author": "",
+  "license": "",
+  "language":"javascript",
+  "scripts": {
+     "start": "es-agent run -c es-agent.yaml"
+    }
+}
