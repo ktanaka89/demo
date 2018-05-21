@@ -1,0 +1,9 @@
+topologies:
+  recieve:
+    bql_file: recieve.bql
+
+logging:
+  min_log_level: debug
+
+network:
+  listen_on: ":15601"

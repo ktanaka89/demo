@@ -1,0 +1,54 @@
+-----------------------------------------------
+-- SCRIPT NAME: recieve 
+-----------------------------------------------
+
+-------------------------------------
+-- DECLARE VARIABLES 
+-------------------------------------
+
+CREATE STATE illumination TYPE float_variable ;
+
+CREATE SINK update_illumination TYPE update_float_variable WITH name = "illumination";
+
+CREATE STATE tem TYPE float_variable ;
+
+CREATE SINK update_tem TYPE update_float_variable WITH name = "tem";
+
+CREATE STATE http_observer TYPE http_observer WITH port = 17700, enable = true;
+
+-------------------------------------
+-- STREAM PROCESSING 
+-------------------------------------
+
+CREATE SOURCE fluentd_in TYPE fluentd WITH bind = "0.0.0.0:8888";
+
+CREATE STREAM mapping_1_tem AS select RSTREAM payload.temperature AS value FROM fluentd_in [RANGE 1 TUPLES];
+
+CREATE SOURCE fins_in TYPE fins_in WITH port = 9600, memory = [], host = "192.168.250.1", interval = 1;
+
+CREATE STREAM mapping_2 AS select RSTREAM ref_float_variable("illumination") AS illumination, ref_float_variable("tem") AS temp, payload.color_detected_level / 100 AS color, payload.fibre_status / 100 AS fibre, "test" AS test FROM fins_in [RANGE 1 TUPLES];
+
+CREATE SINK soracom_harvest TYPE tcp WITH port = 8514, host = "harvest.soracom.io";
+
+INSERT INTO soracom_harvest FROM mapping_2;
+
+CREATE SINK stdout_1 TYPE stdout;
+
+CREATE SINK soracom_funnel TYPE tcp WITH port = 23080, host = "funnel.soracom.io";
+
+CREATE STREAM mapping_1_illumination AS select RSTREAM payload.illumination AS value FROM fluentd_in [RANGE 1 TUPLES];
+
+INSERT INTO update_illumination FROM mapping_1_illumination;
+
+INSERT INTO soracom_funnel FROM fins_in;
+
+INSERT INTO stdout_1 FROM fins_in;
+
+CREATE STREAM mapping_1 AS select RSTREAM payload.illumination AS illumination, payload.temperature AS temp FROM fluentd_in [RANGE 1 TUPLES];
+
+CREATE SINK stdout TYPE stdout;
+
+INSERT INTO stdout FROM mapping_1;
+
+INSERT INTO update_tem FROM mapping_1_tem;
+
