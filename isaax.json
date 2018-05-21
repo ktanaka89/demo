@@ -4,7 +4,7 @@
   "description": "demo",
   "main": "es-agent",
   "author": "ktanaka89",
-  "license": "",
+  "license": "tanaka",
   "language":"javascript",
   "scripts": {
      "start": "/var/isaax/project/es-agent run -c /var/isaax/project/es-agent.yaml"
