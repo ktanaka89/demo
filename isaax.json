@@ -7,6 +7,6 @@
   "license": "",
   "language":"javascript",
   "scripts": {
-     "start": "es-agent run -c es-agent.yaml"
+     "start": "/var/isaax/project/es-agent run -c /var/isaax/project/es-agent.yaml"
     }
 }
